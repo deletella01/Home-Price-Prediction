@@ -3,16 +3,25 @@ import util
 
 app = Flask(__name__)
 
+# Load model artifacts when module is imported so it works with
+# `python server.py`, `flask run`, and production WSGI servers.
+util.load_saved_artifacts()
+
 @app.route('/get_location_names', methods=['GET'])
 def get_location_names():
+    locations = util.get_location_names()
+    if locations is None:
+        util.load_saved_artifacts()
+        locations = util.get_location_names()
+
     response = jsonify({
-        'locations': util.get_location_names()
+        'locations': locations
     })
     response.headers.add('Access-Control-Allow-Origin', '*')
 
     return response
 
-@app.route('/predict_home_price', methods=['GET', 'POST'])
+@app.route('/predict_home_price', methods=['POST'])
 def predict_home_price():
     total_sqft = float(request.form['total_sqft'])
     location = request.form['location']
