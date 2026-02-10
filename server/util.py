@@ -1,4 +1,5 @@
 import json
+import os
 import numpy as np
 import joblib
 import warnings
@@ -29,13 +30,17 @@ def load_saved_artifacts():
     global __data_columns
     global __locations
 
-    with open("./artifacts/columns.json", "r") as f:
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    columns_path = os.path.join(base_dir, "artifacts", "columns.json")
+    model_path = os.path.join(base_dir, "artifacts", "Homeprice.pkl")
+
+    with open(columns_path, "r") as f:
         __data_columns = json.load(f)['data_columns']
         __locations = __data_columns[3:]  # first 3 columns are sqft, bath, bhk
 
     global __model
     if __model is None:
-        __model = joblib.load('./artifacts/Homeprice.pkl')
+        __model = joblib.load(model_path)
     print("loading saved artifacts...done")
 
 def get_location_names():

@@ -1,5 +1,8 @@
 from flask import Flask, request, jsonify
-import util
+try:
+    from . import util
+except ImportError:
+    import util
 
 app = Flask(__name__)
 
