@@ -8,6 +8,23 @@ function getBathValue() {
   return -1; // Invalid Value
 }
 
+function getApiBaseUrl() {
+  // If opening app.html directly from file://, call local Flask explicitly.
+  if (window.location.protocol === "file:") {
+    return "http://127.0.0.1:5000";
+  }
+
+  // If running from localhost on another port, call Flask on 5000.
+  if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+    if (window.location.port && window.location.port !== "5000") {
+      return "http://127.0.0.1:5000";
+    }
+  }
+
+  // In production (e.g., Vercel), use same-origin relative paths.
+  return "";
+}
+
 function getBHKValue() {
   var uiBHK = document.getElementsByName("uiBHK");
   for(var i in uiBHK) {
@@ -26,8 +43,8 @@ function onClickedEstimatePrice() {
   var location = document.getElementById("uiLocations");
   var estPrice = document.getElementById("uiEstimatedPrice");
 
-  var url = "http://127.0.0.1:5000/predict_home_price"; //Use this if you are NOT using nginx which is first 7 tutorials
-  //var url = "/api/predict_home_price"; // Use this if  you are using nginx. i.e tutorial 8 and onwards
+  var apiBase = getApiBaseUrl();
+  var url = apiBase + "/api/predict_home_price";
 
   $.post(url, {
       total_sqft: parseFloat(sqft.value),
@@ -43,8 +60,8 @@ function onClickedEstimatePrice() {
 
 function onPageLoad() {
   console.log( "document loaded" );
-  var url = "http://127.0.0.1:5000/get_location_names"; // Use this if you are NOT using nginx which is first 7 tutorials
-  //var url = "/api/get_location_names"; // Use this if  you are using nginx. i.e tutorial 8 and onwards
+  var apiBase = getApiBaseUrl();
+  var url = apiBase + "/api/get_location_names";
   $.get(url,function(data, status) {
       console.log("got response for get_location_names request");
       if(data) {
